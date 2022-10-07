@@ -14,6 +14,7 @@ func TestBarber_0seats(t *testing.T) {
 		t.Fatal("could not received the customer")
 	}
 	cust1.WaitToDone()
+	barber.Close()
 }
 
 func TestBarber_0seatsMultiCustomer(t *testing.T) {
@@ -31,6 +32,7 @@ func TestBarber_0seatsMultiCustomer(t *testing.T) {
 		t.Fatal("could not received the customer")
 	}
 	cust2.WaitToDone()
+	barber.Close()
 }
 
 func TestBarber_0seatsMultiCustomerCongestion(t *testing.T) {
@@ -47,6 +49,7 @@ func TestBarber_0seatsMultiCustomerCongestion(t *testing.T) {
 	}
 	barber.StartWork()
 	cust1.WaitToDone()
+	barber.Close()
 }
 
 func TestBarber_oneCustomer(t *testing.T) {
@@ -58,6 +61,7 @@ func TestBarber_oneCustomer(t *testing.T) {
 		t.Fatal("could not received the customer")
 	}
 	cust1.WaitToDone()
+	barber.Close()
 }
 
 func TestBarber_multipleCustomer(t *testing.T) {
@@ -78,6 +82,7 @@ func TestBarber_multipleCustomer(t *testing.T) {
 
 	cust1.WaitToDone()
 	cust2.WaitToDone()
+	barber.Close()
 }
 
 func TestBarber_overLoad(t *testing.T) {
@@ -112,6 +117,7 @@ func TestBarber_overLoadAndRetry(t *testing.T) {
 		t.Fatal("invalid seats handling")
 	}
 	cust2.WaitToDone()
+	barber.Close()
 }
 
 func TestBarber_burst(t *testing.T) {
@@ -132,4 +138,5 @@ func TestBarber_burst(t *testing.T) {
 	for i := 0; i < len(customers); i++ {
 		customers[i].WaitToDone()
 	}
+	barber.Close()
 }

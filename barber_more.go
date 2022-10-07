@@ -1,12 +1,14 @@
 package sleepy
 
 type barberMore struct {
-	seats chan Customer
+	seats     chan Customer
+	closeChan chan struct{}
 }
 
 func newBarberMore(seats int) Barber {
 	return barberMore{
-		seats: make(chan Customer, seats),
+		seats:     make(chan Customer, seats),
+		closeChan: make(chan struct{}),
 	}
 }
 
@@ -25,9 +27,21 @@ func (b barberMore) EnterCustomer(c Customer) bool {
 	}
 }
 
+// Close stop working
+func (b barberMore) Close() {
+	select {
+	case b.closeChan <- struct{}{}:
+	default:
+	}
+}
+
 func (b barberMore) work() {
 	for {
-		c := <-b.seats
-		c.cut()
+		select {
+		case c := <-b.seats:
+			c.cut()
+		case _ = <-b.closeChan:
+			return
+		}
 	}
 }

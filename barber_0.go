@@ -5,14 +5,16 @@ import (
 )
 
 type barber0 struct {
-	mutex  *sync.Mutex
-	wakeUp chan Customer
+	mutex     *sync.Mutex
+	wakeUp    chan Customer
+	closeChan chan struct{}
 }
 
 func newBarber0() barber0 {
 	return barber0{
-		mutex:  &sync.Mutex{},
-		wakeUp: make(chan Customer, 1),
+		mutex:     &sync.Mutex{},
+		wakeUp:    make(chan Customer, 1),
+		closeChan: make(chan struct{}),
 	}
 }
 
@@ -31,10 +33,22 @@ func (b barber0) EnterCustomer(c Customer) bool {
 	return true
 }
 
+// Close stop working
+func (b barber0) Close() {
+	select {
+	case b.closeChan <- struct{}{}:
+	default:
+	}
+}
+
 func (b barber0) work() {
 	for {
-		c := <-b.wakeUp
-		c.cut()
-		b.mutex.Unlock()
+		select {
+		case c := <-b.wakeUp:
+			c.cut()
+			b.mutex.Unlock()
+		case _ = <-b.closeChan:
+			return
+		}
 	}
 }

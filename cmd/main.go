@@ -8,4 +8,5 @@ func main() {
 	barber.StartWork()
 	barber.EnterCustomer(customer)
 	customer.WaitToDone()
+	barber.Close()
 }
