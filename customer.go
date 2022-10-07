@@ -17,7 +17,7 @@ func NewCustomer() Customer {
 	return c
 }
 
-// WaitToDone wait the func until the barber do not cut the hair
+// WaitToDone will wait until the barber complete
 func (c Customer) WaitToDone() {
 	c.wg.Wait()
 }
