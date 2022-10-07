@@ -2,6 +2,7 @@ package sleepy
 
 import (
 	"testing"
+	"time"
 )
 
 func TestBarber_0seats(t *testing.T) {
@@ -111,4 +112,24 @@ func TestBarber_overLoadAndRetry(t *testing.T) {
 		t.Fatal("invalid seats handling")
 	}
 	cust2.WaitToDone()
+}
+
+func TestBarber_burst(t *testing.T) {
+	barber := NewBarber(1)
+	barber.StartWork()
+
+	customers := make([]Customer, 50)
+	for i := 0; i < len(customers); i++ {
+		c := NewCustomer()
+		customers[i] = c
+		go func(c Customer) {
+			for true != barber.EnterCustomer(c) {
+				time.Sleep(100 * time.Microsecond)
+			}
+		}(c)
+	}
+
+	for i := 0; i < len(customers); i++ {
+		customers[i].WaitToDone()
+	}
 }
