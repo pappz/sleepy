@@ -1,24 +1,25 @@
 package sleepy
 
-type barberMore struct {
+// This implementation has been used in case have waiting room with several seats
+type barberSeveral struct {
 	seats     chan Customer
 	closeChan chan struct{}
 }
 
-func newBarberMore(seats int) Barber {
-	return barberMore{
+func newBarberSeveral(seats int) Barber {
+	return barberSeveral{
 		seats:     make(chan Customer, seats),
 		closeChan: make(chan struct{}),
 	}
 }
 
 // StartWork Run in background the haircut process. It should not call multiple times
-func (b barberMore) StartWork() {
+func (b barberSeveral) StartWork() {
 	go b.work()
 }
 
 // EnterCustomer return false if all seats is taken
-func (b barberMore) EnterCustomer(c Customer) bool {
+func (b barberSeveral) EnterCustomer(c Customer) bool {
 	select {
 	case b.seats <- c:
 		return true
@@ -28,14 +29,14 @@ func (b barberMore) EnterCustomer(c Customer) bool {
 }
 
 // Close stop working
-func (b barberMore) Close() {
+func (b barberSeveral) Close() {
 	select {
 	case b.closeChan <- struct{}{}:
 	default:
 	}
 }
 
-func (b barberMore) work() {
+func (b barberSeveral) work() {
 	for {
 		select {
 		case c := <-b.seats:

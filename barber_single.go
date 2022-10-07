@@ -4,14 +4,15 @@ import (
 	"sync"
 )
 
-type barber0 struct {
+// This implementation has been used in case the number of seats is 0
+type barberSingle struct {
 	mutex     *sync.Mutex
 	wakeUp    chan Customer
 	closeChan chan struct{}
 }
 
-func newBarber0() barber0 {
-	return barber0{
+func newBarberSingle() barberSingle {
+	return barberSingle{
 		mutex:     &sync.Mutex{},
 		wakeUp:    make(chan Customer, 1),
 		closeChan: make(chan struct{}),
@@ -19,12 +20,12 @@ func newBarber0() barber0 {
 }
 
 // StartWork Run in background the haircut process. It should not call multiple times
-func (b barber0) StartWork() {
+func (b barberSingle) StartWork() {
 	go b.work()
 }
 
 // EnterCustomer return true if the shop is empty and the barber can start the work
-func (b barber0) EnterCustomer(c Customer) bool {
+func (b barberSingle) EnterCustomer(c Customer) bool {
 	ok := b.mutex.TryLock()
 	if !ok {
 		return false
@@ -34,14 +35,14 @@ func (b barber0) EnterCustomer(c Customer) bool {
 }
 
 // Close stop working
-func (b barber0) Close() {
+func (b barberSingle) Close() {
 	select {
 	case b.closeChan <- struct{}{}:
 	default:
 	}
 }
 
-func (b barber0) work() {
+func (b barberSingle) work() {
 	for {
 		select {
 		case c := <-b.wakeUp:

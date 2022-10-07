@@ -9,8 +9,8 @@ type Barber interface {
 // NewBarber based on the available seats return the best implementation
 func NewBarber(seats int) Barber {
 	if seats >= 1 {
-		return newBarberMore(seats)
+		return newBarberSeveral(seats)
 	} else {
-		return newBarber0()
+		return newBarberSingle()
 	}
 }
